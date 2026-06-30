@@ -10,51 +10,53 @@ import librosa.display
 import matplotlib.pyplot as plt
 import numpy as np
 
-# 1. Page Config (Enables widescreen mode)
-st.set_page_config(page_title="VBCUA Enterprise", page_icon="🎙️", layout="wide")
+# 1. Page Config (Widescreen Dashboard)
+st.set_page_config(page_title="VBCUA | AI Evaluation", page_icon="🎙️", layout="wide")
 
 def display_waveform(audio_path):
     try:
         y, sr = librosa.load(audio_path, sr=None)
         fig, ax = plt.subplots(figsize=(12, 3))
-        librosa.display.waveshow(y, sr=sr, ax=ax, color="#2E7D32", alpha=0.7)
-        ax.set(title="Acoustic Amplitude Profile", xlabel="Time (seconds)", ylabel="Amplitude")
-        ax.set_facecolor('#fafafa')
-        fig.patch.set_facecolor('#fafafa')
+        # Sleek indigo color for the waveform
+        librosa.display.waveshow(y, sr=sr, ax=ax, color="#4F46E5", alpha=0.8) 
+        ax.set(title="Acoustic Signal Profile", xlabel="Time (seconds)", ylabel="Amplitude")
+        ax.set_facecolor('#F8FAFC')
+        fig.patch.set_facecolor('#F8FAFC')
         st.pyplot(fig)
     except Exception as e:
-        st.error(f"Waveform Generation Suspended: {e}")
+        st.warning("Waveform visualization unavailable for this file format.")
 
-# 2. Hero Section Header
+# 2. Hero Section
 st.title("🎙️ Voice-Based Concept Understanding Analyser")
-st.caption("Enterprise AI Assessment Platform | Audio Signal Processing & Semantic Evaluation")
+st.markdown("**Enterprise AI Assessment Platform** | Evaluate spoken knowledge against benchmark concepts with precision.")
 
 # 3. Sidebar Input Control Panel
 with st.sidebar:
-    st.header("⚙️ Configuration Panel")
-    st.subheader("1. Data Ingestion")
-    uploaded_audio = st.file_uploader("Upload Target Audio File", type=["wav", "mp3", "ogg"])
+    st.header("⚙️ Evaluation Setup")
     
-    st.subheader("2. Ground Truth Target")
-    reference_concept = st.text_area("Reference Concept Script", height=180, placeholder="Input key benchmark evaluation concepts...")
+    st.subheader("1. Audio Input")
+    uploaded_audio = st.file_uploader("Upload student voice recording", type=["wav", "mp3", "ogg"])
+    
+    st.subheader("2. Benchmark Criteria")
+    reference_concept = st.text_area("Ideal Reference Answer", height=180, placeholder="Paste the exact concept the student should be explaining...")
     
     st.markdown("---")
-    analyze_button = st.button("🚀 Execute AI Pipeline", use_container_width=True)
+    analyze_button = st.button("🚀 Run AI Evaluation", use_container_width=True)
 
-# 4. Processing Core & Tabbed Display
+# 4. Processing Core & Dashboard
 if analyze_button:
     if uploaded_audio and reference_concept:
         with st.status("Executing Cognitive Pipeline...", expanded=True) as status:
-            st.write("🔄 Initializing audio stream extraction...")
+            st.write("🔄 Initializing audio stream...")
             file_extension = uploaded_audio.name.split(".")[-1]
             temp_filename = f"temp_audio.{file_extension}"
             with open(temp_filename, "wb") as f:
                 f.write(uploaded_audio.read())
             
-            st.write("🤖 Transcribing vocal frequencies (OpenAI Whisper Engine)...")
+            st.write("🤖 Transcribing audio with AI...")
             transcribed_text = transcribe_audio(temp_filename)
             
-            st.write("🧠 Executing semantic mapping vectors (S-BERT Core)...")
+            st.write("🧠 Analyzing semantic similarity...")
             score = calculate_similarity(transcribed_text, reference_concept)
             level = classify_understanding(score)
             filler_ratio = calculate_filler_ratio(transcribed_text)
@@ -64,63 +66,63 @@ if analyze_button:
                 'level': level, 
                 'transcription': transcribed_text
             }
-            status.update(label="Analysis Pipeline Complete!", state="complete", expanded=False)
+            status.update(label="Analysis Complete!", state="complete", expanded=False)
 
-        # --- THE PREMIERE TAB LAYOUT ---
-        tab1, tab2, tab3 = st.tabs(["📊 Performance Analytics", "📝 Transcription Matrix", "📋 Generation Report"])
+        # --- PREMIUM TABBED DASHBOARD ---
+        tab1, tab2, tab3 = st.tabs(["📊 Performance Metrics", "📝 AI Transcription", "📄 Official Report"])
 
         with tab1:
-            st.markdown("### Executive Dashboard Overview")
+            st.markdown("### Executive Overview")
             
             # KPI Metric Grid
             m1, m2, m3 = st.columns(3)
-            m1.metric(label="Conceptual Alignment Score", value=f"{score * 100:.1f}%", delta=f"{score:.2f} / 1.00")
-            m2.metric(label="Fluency Accuracy Index", value=level)
-            m3.metric(label="Filler Velocity Ratio", value=f"{filler_ratio:.2f}")
+            m1.metric(label="Conceptual Alignment", value=f"{score * 100:.1f}%", delta=f"{score:.2f} / 1.00")
+            m2.metric(label="Assessed Level", value=level)
+            m3.metric(label="Filler Word Ratio", value=f"{filler_ratio:.2f}")
 
-            # Status Message
+            # Contextual Feedback
             if score >= 0.7:
-                st.success(f"**Optimal Alignment Detected:** Explanatory proficiency aligns systematically with core reference structures.")
+                st.success("**High Proficiency:** The spoken explanation closely matches the required benchmark criteria.")
             elif score >= 0.4:
-                st.warning(f"**Partial Alignment Detected:** Narrative vectors intersect core values but require granular elaboration.")
+                st.warning("**Developing Proficiency:** Key concepts were mentioned, but deeper elaboration is required.")
             else:
-                st.error(f"**Structural Gap Detected:** Evaluated audio file demonstrates low convergence with standard requirements.")
+                st.error("**Concept Gap:** The spoken explanation does not adequately cover the benchmark criteria.")
 
-            # Waveform inside a clean, interactive drop-down expander
-            with st.expander("🔍 View Acoustic Structural Waveform Analysis", expanded=True):
-               st.audio(uploaded_audio)
-            display_waveform(uploaded_audio)
+            # Interactive Audio & Waveform Expander (Bug Fixed Here!)
+            with st.expander("🔍 Explore Audio Diagnostics", expanded=True):
+                st.audio(uploaded_audio) 
+                display_waveform(temp_filename)
 
         with tab2:
-            st.markdown("### AI Derived Transcription Matrix")
-            st.info("The text below indicates the raw speech-to-text outputs processed through high-fidelity lexical modeling.")
-            st.text_area("Decoded Audio Output String", value=transcribed_text, height=250, disabled=True)
+            st.markdown("### Decoded Speech Transcript")
+            st.info("The text below represents exactly what the AI system heard and processed.")
+            st.text_area("Raw AI Transcript", value=transcribed_text, height=250, disabled=True)
 
         with tab3:
-            st.markdown("### Compliance & Verification Export")
-            st.markdown("Generate and compile immutable evaluation transcripts for submission documentation arrays.")
+            st.markdown("### Export Documentation")
+            st.markdown("Generate a printable PDF evaluation report for your records.")
             
             buffer = io.BytesIO()
             generate_pdf(st.session_state['report_data'], buffer)
             
             st.download_button(
-                label="⬇️ Export Official PDF Documentation",
+                label="⬇️ Download Official PDF Report",
                 data=buffer.getvalue(),
                 file_name="VBCUA_Evaluation_Report.pdf",
                 mime="application/pdf",
                 use_container_width=True
             )
 
-        # Secure workspace cleanup
+        # Safe cleanup
         if os.path.exists(temp_filename):
             os.remove(temp_filename)
     else:
-        st.sidebar.error("Error: Missing mandatory runtime parameters.")
+        st.sidebar.error("Error: Please provide both an audio file and benchmark criteria.")
 
-# Persist download capability if context states are active
+# Persist download button globally
 elif 'report_data' in st.session_state:
     st.markdown("---")
-    with st.expander("📥 Download Report from Previous Active Session"):
+    with st.expander("📥 Access Previous Session Report"):
         buffer = io.BytesIO()
         generate_pdf(st.session_state['report_data'], buffer)
-        st.download_button(label="Download PDF Report File", data=buffer.getvalue(), file_name="VBCUA_Evaluation_Report.pdf", mime="application/pdf")
+        st.download_button(label="Download PDF Report", data=buffer.getvalue(), file_name="VBCUA_Evaluation_Report.pdf", mime="application/pdf")
