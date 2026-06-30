@@ -88,8 +88,8 @@ if analyze_button:
 
             # Waveform inside a clean, interactive drop-down expander
             with st.expander("🔍 View Acoustic Structural Waveform Analysis", expanded=True):
-                st.audio(temp_filename)
-                display_waveform(temp_filename)
+               st.audio(uploaded_audio)
+                display_waveform(uploaded_audio)
 
         with tab2:
             st.markdown("### AI Derived Transcription Matrix")
